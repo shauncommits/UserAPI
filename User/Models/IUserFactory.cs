@@ -2,9 +2,9 @@ namespace User.Models;
 
 public interface IUserFactory
 {
-    User GetUserById(string id);
-    void AddUser(User employee);
-    void UpdateUser(User employee);
-    void DeleteUser(string id);
-    IEnumerable<User> GetUserList();
+    Task<User> GetUserById(string id);
+    Task AddUser(User employee);
+    Task UpdateUser(User employee);
+    Task DeleteUser(string id);
+    Task<List<User>> GetUserList();
 }
