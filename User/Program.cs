@@ -12,9 +12,19 @@ builder.Services.AddSwaggerGen();
 // Add Scoped IUserFactory
 builder.Services.AddScoped<IUserFactory, UserFactory>();
 
-// Add DbContext Service
-string connectionString = "Server=127.0.0.1,1433;Database=Users;User Id=sa;Password=Password_123;TrustServerCertificate=true";
+// Add appsettings unto the configuration root
+var appSettingsBuilder = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
 
+// Get the current environment url
+var url = Environment.GetEnvironmentVariable("ASPNETCORE_SQL_ENV");
+
+// Get connection string from appsettings
+string connectionString = appSettingsBuilder["ConnectionStrings:SqlConnection"]
+    .Replace("${ENV}", url);
+
+// Add DbContext Service
 builder.Services.AddDbContext<UserDBContext>(options =>
     options.UseSqlServer(connectionString));
 
