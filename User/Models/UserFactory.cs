@@ -1,29 +1,85 @@
+using System.Text.RegularExpressions;
+
 namespace User.Models;
 
 public class UserFactory: IUserFactory
 {
-    public User GetUserById(string id)
+    private readonly UserDBContext _dbContext;
+    private List<User> _users;
+    
+    public UserFactory(UserDBContext dbContext)
     {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
+        _users = _dbContext.Users.ToList();
+    }
+    public async Task<User> GetUserById(string id)
+    {
+        // Using Guid.Parse
+        var guid = Guid.Parse(id);
+        
+        // Using Guid.TryParse
+        if (Guid.TryParse(id, out guid))
+        {
+            // Conversion successful
+            return _users.FirstOrDefault(e => e.Id == guid);
+
+        }
+        else
+        {
+            // Conversion failed
+            return null;
+        }
     }
 
-    public void AddUser(User employee)
+    public Task AddUser(User user)
     {
-        throw new NotImplementedException();
+        _dbContext.Users.AddAsync(user);
+       return _dbContext.SaveChangesAsync();
     }
 
-    public void UpdateUser(User employee)
+    public Task UpdateUser(User userUpdate)
     {
-        throw new NotImplementedException();
+        // Updating the user on the database
+        var user = _users.FirstOrDefault(e => e.Id == userUpdate.Id);
+        
+        user.Name = userUpdate.Name;
+        user.Surname = userUpdate.Surname;
+        user.Role = userUpdate.Role;
+        user.Password = userUpdate.Password;
+        user.Email = userUpdate.Email;
+        
+        return _dbContext.SaveChangesAsync();
     }
 
-    public void DeleteUser(string id)
+    public Task DeleteUser(string id)
     {
-        throw new NotImplementedException();
+        // Using Guid.Parse
+        var guid = Guid.Parse(id);
+
+        // Using Guid.TryParse
+        if (Guid.TryParse(id, out guid))
+        {
+            // Conversion successful
+            
+            // Delete Employee from the database
+            var user = _users.FirstOrDefault(e => e.Id == guid);
+            if (user != null)
+            {
+                _dbContext.Users.Remove(user);
+                return _dbContext.SaveChangesAsync();
+            }
+        }
+        else
+        {
+            // Conversion failed
+        }
+        
+
+        return null;
     }
 
-    public IEnumerable<User> GetUserList()
+    public async Task<List<User>> GetUserList()
     {
-        throw new NotImplementedException();
+        return _users;
     }
 }
