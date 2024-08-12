@@ -18,7 +18,8 @@ var appSettingsBuilder = new ConfigurationBuilder()
     .Build();
 
 // Get the current environment url
-var url = Environment.GetEnvironmentVariable("ASPNETCORE_SQL_ENV");
+// var url = Environment.GetEnvironmentVariable("ASPNETCORE_SQL_ENV");
+var url = "127.0.0.1";
 
 // Get connection string from appsettings
 string connectionString = appSettingsBuilder["ConnectionStrings:SqlConnection"]
