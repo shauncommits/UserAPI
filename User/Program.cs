@@ -18,8 +18,8 @@ var appSettingsBuilder = new ConfigurationBuilder()
     .Build();
 
 // Get the current environment url
-// var url = Environment.GetEnvironmentVariable("ASPNETCORE_SQL_ENV");
-var url = "127.0.0.1";
+var url = Environment.GetEnvironmentVariable("ASPNETCORE_SQL_ENV");
+// var url = "127.0.0.1"; 
 
 // Get connection string from appsettings
 string connectionString = appSettingsBuilder["ConnectionStrings:SqlConnection"]
@@ -27,7 +27,24 @@ string connectionString = appSettingsBuilder["ConnectionStrings:SqlConnection"]
 
 // Add DbContext Service
 builder.Services.AddDbContext<UserDBContext>(options =>
-    options.UseSqlServer(connectionString));
+{
+    options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+    });
+});
+
+
+
+// services.AddDbContext<YourDbContext>(options =>
+// {
+//     options.UseSqlServer(Configuration.GetConnectionString("YourConnectionString"),
+//         sqlServerOptionsAction: sqlOptions =>
+//         {
+//             sqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+//         });
+// });
+
 
 // Adding Cors
 builder.Services.AddCors(options =>
